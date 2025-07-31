@@ -34,33 +34,6 @@
             border-bottom: 3px solid #667eea;
         }
         
-        .search-container {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .search-box {
-            width: 100%;
-            max-width: 500px;
-            padding: 15px 20px;
-            font-size: 1.1em;
-            border: 2px solid #667eea;
-            border-radius: 30px;
-            outline: none;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        
-        .search-box:focus {
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        .search-box::placeholder {
-            color: #999;
-        }
-        
         .categories-nav {
             background: white;
             border-radius: 15px;
@@ -271,10 +244,6 @@
         <div class="header">
             <h1>🤖 מדריך כלי הבינה המלאכותית המקיף</h1>
             <p>הכלים החדשניים והטובים ביותר לשנת 2025</p>
-        </div>
-
-        <div class="search-container">
-            <input type="text" class="search-box" id="searchInput" placeholder="🔍 חפש כלי לפי שם או תיאור..." />
         </div>
 
         <div class="categories-nav">
@@ -834,37 +803,6 @@
     </div>
 
     <script>
-        // פונקציית חיפוש
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const toolCards = document.querySelectorAll('.tool-card');
-            const categories = document.querySelectorAll('.category');
-            
-            categories.forEach(category => {
-                let hasVisibleTools = false;
-                const categoryTools = category.querySelectorAll('.tool-card');
-                
-                categoryTools.forEach(card => {
-                    const toolName = card.querySelector('.tool-name').textContent.toLowerCase();
-                    const toolDescription = card.querySelector('.tool-description').textContent.toLowerCase();
-                    
-                    if (toolName.includes(searchTerm) || toolDescription.includes(searchTerm)) {
-                        card.style.display = 'block';
-                        hasVisibleTools = true;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                // הסתר/הראה קטגוריה לפי תוצאות החיפוש
-                if (hasVisibleTools || searchTerm === '') {
-                    category.style.display = 'block';
-                } else {
-                    category.style.display = 'none';
-                }
-            });
-        });
-        
         // פונקציית ניווט לקטגוריות
         document.querySelectorAll('.category-link').forEach(link => {
             link.addEventListener('click', function(e) {
