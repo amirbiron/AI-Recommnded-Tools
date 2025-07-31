@@ -224,6 +224,90 @@
             color: rgba(255, 255, 255, 0.9);
         }
         
+        /* Search Box Styles */
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+            direction: rtl;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.2em;
+            pointer-events: none;
+        }
+        
+        .search-clear {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 5px;
+            border-radius: 50%;
+        }
+        
+        .search-clear:hover {
+            background: #f8f9fa;
+            color: #e74c3c;
+        }
+        
+        .search-clear.visible {
+            opacity: 1;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            display: none;
+        }
+        
+        .no-results-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
         @media (max-width: 768px) {
             .tools-grid {
                 grid-template-columns: 1fr;
@@ -244,6 +328,22 @@
         <div class="header">
             <h1>🤖 מדריך כלי הבינה המלאכותית המקיף</h1>
             <p>הכלים החדשניים והטובים ביותר לשנת 2025</p>
+        </div>
+
+        <!-- Search Container -->
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="חפש כלי לפי שם או תיאור..." id="searchInput">
+                <span class="search-icon">🔍</span>
+                <button class="search-clear" id="clearSearch" title="נקה חיפוש">✕</button>
+            </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults">
+            <span class="no-results-icon">🔍</span>
+            <div>לא נמצאו כלים התואמים לחיפוש שלך</div>
+            <div style="font-size: 0.9em; margin-top: 10px; color: #95a5a6;">נסה מילות חיפוש אחרות</div>
         </div>
 
         <div class="categories-nav">
@@ -816,6 +916,96 @@
                     });
                 }
             });
+        });
+
+        // פונקציונליות החיפוש
+        const searchInput = document.getElementById('searchInput');
+        const clearButton = document.getElementById('clearSearch');
+        const noResultsDiv = document.getElementById('noResults');
+        const categoriesNav = document.querySelector('.categories-nav');
+        
+        // פונקציית החיפוש הראשית
+        function performSearch(searchTerm) {
+            const categories = document.querySelectorAll('.category');
+            const toolCards = document.querySelectorAll('.tool-card');
+            let hasResults = false;
+            
+            // אם החיפוש ריק, הצג הכל
+            if (!searchTerm.trim()) {
+                categories.forEach(category => {
+                    category.style.display = 'block';
+                });
+                toolCards.forEach(card => {
+                    card.style.display = 'block';
+                });
+                noResultsDiv.style.display = 'none';
+                categoriesNav.style.display = 'block';
+                return;
+            }
+            
+            // הסתר את ניווט הקטגוריות במהלך החיפוש
+            categoriesNav.style.display = 'none';
+            
+            // חיפוש case-insensitive
+            const searchTermLower = searchTerm.toLowerCase();
+            
+            categories.forEach(category => {
+                const categoryTools = category.querySelectorAll('.tool-card');
+                let categoryHasResults = false;
+                
+                categoryTools.forEach(card => {
+                    const toolName = card.querySelector('.tool-name');
+                    const toolDescription = card.querySelector('.tool-description');
+                    
+                    if (toolName && toolDescription) {
+                        const nameText = toolName.textContent.toLowerCase();
+                        const descText = toolDescription.textContent.toLowerCase();
+                        
+                        // בדיקה אם החיפוש נמצא בשם או בתיאור
+                        if (nameText.includes(searchTermLower) || descText.includes(searchTermLower)) {
+                            card.style.display = 'block';
+                            categoryHasResults = true;
+                            hasResults = true;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+                
+                // הצג/הסתר קטגוריה בהתאם לתוצאות
+                category.style.display = categoryHasResults ? 'block' : 'none';
+            });
+            
+            // הצג/הסתר הודעת "אין תוצאות"
+            noResultsDiv.style.display = hasResults ? 'none' : 'block';
+        }
+        
+        // האזנה לשינויים בשדה החיפוש
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value;
+            performSearch(searchTerm);
+            
+            // הצג/הסתר כפתור הניקוי
+            if (searchTerm.length > 0) {
+                clearButton.classList.add('visible');
+            } else {
+                clearButton.classList.remove('visible');
+            }
+        });
+        
+        // כפתור ניקוי החיפוש
+        clearButton.addEventListener('click', function() {
+            searchInput.value = '';
+            performSearch('');
+            clearButton.classList.remove('visible');
+            searchInput.focus();
+        });
+        
+        // חיפוש בלחיצת Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch(this.value);
+            }
         });
     </script>
 </body>
